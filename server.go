@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"text/template"
+
+	oth "chat_go/other"
 )
 
 // Need to investigate this code format.
@@ -19,10 +21,10 @@ func main() {
 	flag.Parse()
 	tpl := template.Must(template.ParseFiles("index.html"))
 
-	h := NewHub()
+	h := oth.NewHub()
 	router := http.NewServeMux()				// multiplexer
 	router.Handle("/", homeHandler(tpl))
-	router.Handle("/ws", WSHandler{h: h})		// need to check what this function does
+	router.Handle("/ws", oth.WSHandler{h: h})		// need to check what this function does
 	log.Printf("serving on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

@@ -1,4 +1,4 @@
-package main
+package other
 
 import (
 	"log"
@@ -6,19 +6,19 @@ import (
 	"time"
 )
 
-type hub struct {
+type Hub struct {
 	connectionsMx sync.RWMutex
-	connections map[*connection]struct{}
+	connections map[*Connection]struct{}
 	broadcast chan []byte
 	logMx sync.RWMutex
 	log [][]byte
 }
 
-func NewHub() *hub {
-	h := &hub{
+func NewHub() *Hub {
+	h := &Hub{
 		connectionsMx: sync.RWMutex{},
 		broadcast: make(chan []byte),
-		connections: make(map[*connection]struct{}),
+		connections: make(map[*Connection]struct{}),
 	}
 
 	go func() {
@@ -41,7 +41,7 @@ func NewHub() *hub {
 }
 
 // addConnection adds new connection to hub array of connections.
-func (h *hub) addConnection(conn *connection) {
+func (h *Hub) addConnection(conn *Connection) {
 	// first the connections mutex locks the object so a new connection can be added
 	h.connectionsMx.Lock()	
 	defer h.connectionsMx.Unlock()  // unlock is defered until the actions are complete
@@ -49,7 +49,7 @@ func (h *hub) addConnection(conn *connection) {
 }
 
 // removeConnection locks object mutex so specific connection can be removed.
-func (h *hub) removeConnection(conn *connection) {
+func (h *Hub) removeConnection(conn *Connection) {
 	h.connectionsMx.Lock()
 	defer h.connectionsMx.Unlock()
 	if _, ok := h.connections[conn]; ok {

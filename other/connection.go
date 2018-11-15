@@ -1,4 +1,4 @@
-package main
+package other
 
 import (
 	"log"
@@ -8,17 +8,17 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type connection struct {
+type Connection struct {
 	// Channel receiving or sending only bytes
 	send chan []byte
-	h *hub
+	h *Hub
 }
 
 type WSHandler struct {
-	h *hub
+	h *Hub
 }
 
-func (c *connection) reader(wg *sync.WaitGroup, wsConn *websocket.Conn) {
+func (c *Connection) reader(wg *sync.WaitGroup, wsConn *websocket.Conn) {
 	defer wg.Done()
 	for {
 		_, message, err := wsConn.ReadMessage()	// check what is returned in this function
@@ -30,7 +30,7 @@ func (c *connection) reader(wg *sync.WaitGroup, wsConn *websocket.Conn) {
 }
 
 // writer range over all information in channel.  Need to check related functions.
-func (c *connection) writer(wg *sync.WaitGroup, wsConn *websocket.Conn) {
+func (c *Connection) writer(wg *sync.WaitGroup, wsConn *websocket.Conn) {
 	defer wg.Done()
 	for message := range c.send {
 		err := wsConn.WriteMessage(websocket.TextMessage, message)	// Need to check what is returned and types
@@ -53,7 +53,7 @@ func (wsh WSHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Need to check what this is actually doing
-	c := &connection{send: make(chan []byte), h: wsh.h}
+	c := &Connection{send: make(chan []byte), h: wsh.h}
 
 	c.h.addConnection(c)			// adding C to its own hub...did know you could do this....
 	defer c.h.removeConnection(c)	// defer removal of actual connection until other connections are closed
